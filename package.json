@@ -1,0 +1,1 @@
+{"name":"ms-collection","private":true,"workspaces":["apps/*","packages/*"],"scripts":{"dev":"npm run dev -w @ms/web","build":"npm run build -w @ms/web","start":"npm run start -w @ms/web","test":"tsx --test packages/shared/src/rules.test.ts"},"devDependencies":{"@playwright/test":"^1.65.1","tsx":"^4.20.0"}}

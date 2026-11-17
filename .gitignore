@@ -1,0 +1,9 @@
+node_modules/
+.next/
+dist/
+out/
+*.tar.gz
+*.tar
+.env*
+!.env.example
+*.tsbuildinfo
