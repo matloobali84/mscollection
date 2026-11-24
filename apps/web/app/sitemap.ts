@@ -1,4 +1,3 @@
-import {shops,products,isVisible} from '@ms/shared';
-export const dynamic='force-static';
-const origin='https://ms-collection-virtual-mall.unhurriedcanopy5.chatgpt.site';
-export default function sitemap(){return [{url:origin},...shops.filter(s=>isVisible(s)).flatMap(s=>[{url:`${origin}/shops/${s.slug}`},...products.filter(p=>p.shopId===s.id).map(p=>({url:`${origin}/shops/${s.slug}/products/${p.slug}`}))])];}
+import {getCatalogue} from '../lib/catalogue';
+export const dynamic='force-dynamic';
+export default async function sitemap(){const {shops,products}=await getCatalogue(),origin=process.env.WEB_ORIGIN||'http://localhost:3000';return [{url:origin},{url:`${origin}/collections`},...['contact','delivery','returns','privacy','terms'].map(page=>({url:`${origin}/help/${page}`})),...shops.map(c=>({url:`${origin}/collections/${c.slug}`})),...products.map(p=>({url:`${origin}/products/${p.slug}`}))]}

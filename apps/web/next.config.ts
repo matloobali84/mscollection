@@ -1,3 +1,3 @@
 import type { NextConfig } from 'next';
-const config: NextConfig = { ...(process.env.STATIC_EXPORT==='1'?{output:'export' as const}:{}), transpilePackages: ['@ms/shared', '@ms/mall-scenes'], devIndicators: false };
+const config: NextConfig = {transpilePackages:['@ms/shared'],devIndicators:false,async redirects(){return [{source:'/mall',destination:'/',permanent:true},{source:'/model-preview',destination:'/',permanent:true},{source:'/shops/:collection/products/:product',destination:'/products/:product',permanent:true},{source:'/shops/:slug',destination:'/collections/:slug',permanent:true}]},async rewrites(){return [{source:'/api/:path*',destination:`${process.env.API_INTERNAL_URL||'http://127.0.0.1:4000'}/api/:path*`},{source:'/media/:path*',destination:`${process.env.API_INTERNAL_URL||'http://127.0.0.1:4000'}/media/:path*`}]}};
 export default config;

@@ -1,0 +1,4 @@
+ALTER TABLE products ADD COLUMN IF NOT EXISTS model_url text NOT NULL DEFAULT '';
+ALTER TABLE products ADD COLUMN IF NOT EXISTS model_scale double precision NOT NULL DEFAULT 1;
+ALTER TABLE shops ADD COLUMN IF NOT EXISTS interior_style text NOT NULL DEFAULT 'boutique';
+CREATE TABLE IF NOT EXISTS scene_entities (id text PRIMARY KEY,name text NOT NULL,kind text NOT NULL CHECK(kind IN ('person','mannequin','display')),floor_id text NOT NULL REFERENCES floors(id),shop_id text REFERENCES shops(id),product_id text REFERENCES products(id),model_url text NOT NULL DEFAULT '',x double precision NOT NULL DEFAULT 0,y double precision NOT NULL DEFAULT 0,z double precision NOT NULL DEFAULT 0,yaw double precision NOT NULL DEFAULT 0,scale double precision NOT NULL DEFAULT 1,animation text NOT NULL DEFAULT '',active boolean NOT NULL DEFAULT true,created_at timestamptz NOT NULL DEFAULT now(),updated_at timestamptz NOT NULL DEFAULT now());

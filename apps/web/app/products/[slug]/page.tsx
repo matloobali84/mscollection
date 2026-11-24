@@ -1,0 +1,7 @@
+import {notFound} from 'next/navigation';
+import {price} from '@ms/shared';
+import Storefront from '../../../components/Storefront';
+import {getCatalogue} from '../../../lib/catalogue';
+export const dynamic='force-dynamic';
+export async function generateMetadata({params}:{params:Promise<{slug:string}>}){const {slug}=await params,data=await getCatalogue(),p=data.products.find(p=>p.slug===slug);return {title:p?`${p.name} | MS Collection`:'Product not found',description:p?.description,alternates:{canonical:`/products/${slug}`},openGraph:p?{title:p.name,description:p.description,images:[p.image]}:undefined}}
+export default async function ProductPage({params}:{params:Promise<{slug:string}>}){const {slug}=await params,data=await getCatalogue(),p=data.products.find(p=>p.slug===slug);if(!p)notFound();const origin=process.env.WEB_ORIGIN||'http://localhost:3000',schema={'@context':'https://schema.org','@type':'Product',name:p.name,description:p.description,image:new URL(p.image||'/product-placeholder.svg',origin).href,sku:p.id,brand:{'@type':'Brand',name:data.settings.name},offers:{'@type':'Offer',url:`${origin}/products/${p.slug}`,priceCurrency:data.settings.currency,price:price(p),availability:p.stock?'https://schema.org/InStock':'https://schema.org/OutOfStock'}};return <><script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(schema).replace(/</g,'\\u003c')}}/><Storefront initialData={data} productSlug={slug}/></>}

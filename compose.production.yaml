@@ -1,0 +1,74 @@
+name: mscollection
+x-app: &app
+  image: mscollection:local
+  build:
+    context: .
+    dockerfile: deploy/Dockerfile
+  restart: unless-stopped
+  init: true
+  environment: &public-env
+    NODE_ENV: production
+    WEB_ORIGIN: https://${SITE_DOMAIN:?Set SITE_DOMAIN in .env.production}
+    API_INTERNAL_URL: http://api:4000
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: mscollection
+      POSTGRES_USER: mscollection
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+    volumes: [postgres_data:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U mscollection -d mscollection']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  api:
+    <<: *app
+    command: [node, node_modules/tsx/dist/cli.mjs, apps/api/src/server.ts]
+    env_file: .env.production
+    environment:
+      <<: *public-env
+      API_HOST: 0.0.0.0
+      API_PORT: '4000'
+      APP_ORIGINS: https://${SITE_DOMAIN}
+      DATABASE_URL: postgresql://mscollection:${POSTGRES_PASSWORD}@postgres:5432/mscollection
+      LOCAL_MEDIA_STORAGE: 'true'
+      TRUST_PROXY: '1'
+    volumes: [media_data:/app/.data/media]
+    depends_on:
+      postgres: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:4000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+  web:
+    <<: *app
+    command: [node, node_modules/next/dist/bin/next, start, apps/web, --hostname, 0.0.0.0, --port, '3000']
+    depends_on:
+      api: {condition: service_healthy}
+  admin:
+    <<: *app
+    environment:
+      <<: *public-env
+      ADMIN_BASE_PATH: /admin
+    command: [node, node_modules/next/dist/bin/next, start, apps/admin, --hostname, 0.0.0.0, --port, '3001']
+    depends_on:
+      api: {condition: service_healthy}
+  proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports: ['80:80', '443:443', '443:443/udp']
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN}
+      TLS_EMAIL: ${TLS_EMAIL:?Set TLS_EMAIL}
+    volumes: ['./deploy/Caddyfile:/etc/caddy/Caddyfile:ro', caddy_data:/data, caddy_config:/config]
+    depends_on: [web, admin]
+volumes:
+  postgres_data:
+  media_data:
+  caddy_data:
+  caddy_config:

@@ -1,0 +1,2 @@
+'use client';
+export async function request(path:string,method='GET',body?:unknown,csrf?:string){const response=await fetch(`/api/v1/${path}`,{method,credentials:'include',headers:{'x-requested-with':'MSCollection',...(body?{'content-type':'application/json'}:{}),...(csrf?{'x-csrf-token':csrf}:{})},body:body?JSON.stringify(body):undefined});const data=await response.json();if(!response.ok)throw new Error(data.error+(data.details?' · '+data.details.map((x:any)=>`${x.path}: ${x.message}`).join('; '):''));return data;}

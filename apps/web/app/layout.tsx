@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import './globals.css';
-import './ui.css';
-export const metadata:Metadata={title:'MS Collection — A new way to wander',description:'Step inside MS Collection. Explore our virtual mall and discover thoughtfully curated clothing and jewellery.'};
+import './store.css';
+export const metadata:Metadata={metadataBase:new URL(process.env.WEB_ORIGIN||'http://localhost:3000'),title:'MS Collection | Good finds. Every day.',description:'Shop clothing, shoes, beauty, accessories, electronics and home essentials at MS Collection. Thoughtfully chosen products, delivered across Pakistan.',openGraph:{type:'website',siteName:'MS Collection',locale:'en_PK',title:'MS Collection | Good finds. Every day.',description:'Discover considered pieces for your wardrobe, home and everyday life.'},twitter:{card:'summary',title:'MS Collection | Good finds. Every day.'}};
 export default function Layout({children}:{children:React.ReactNode}){return <html lang="en"><body>{children}</body></html>}

@@ -1,7 +1,8 @@
 import { z } from 'zod';
-export const shopSchema = z.object({ id:z.string(), slug:z.string(), name:z.string().min(1), tagline:z.string(), category:z.string(), floor:z.number().int().nonnegative(), slot:z.string().nullable(), active:z.boolean(), template:z.enum(['clothing','jewellery']), color:z.string() });
+export const shopSchema = z.object({ id:z.string(), slug:z.string(), name:z.string().min(1), tagline:z.string(), category:z.string(), floor:z.number().int().nonnegative(), slot:z.string().nullable(), active:z.boolean(), template:z.enum(['clothing','jewellery','shoes','cosmetics','generic']), color:z.string(),interiorStyle:z.enum(['boutique','aisles']).optional() });
 export type Shop = z.infer<typeof shopSchema>;
-export type Product = { id:string; slug:string; shopId:string; name:string; category:string; description:string; price:number; salePrice?:number; saleStart?:string; saleEnd?:string; image:string; sizes:string[]; colors:string[]; stock:number; featured:boolean };
+export type SceneEntity={id:string;name:string;kind:'person'|'mannequin'|'display';floorId:string;shopId:string|null;productId:string|null;modelUrl:string;x:number;y:number;z:number;yaw:number;scale:number;animation:string;active:boolean};
+export type Product = { id:string; slug:string; shopId:string; name:string; category:string; description:string; price:number; salePrice?:number; saleStart?:string; saleEnd?:string; image:string; modelUrl?:string;modelScale?:number; media?:{url:string;alt?:string;variants?:Record<string,string>}[]; sizes:string[]; colors:string[]; stock:number; featured:boolean };
 export type Floor = { id:number; name:string; active:boolean };
 export const floors:Floor[] = [{id:0,name:'Ground floor',active:true}];
 export const shops:Shop[] = [
@@ -35,10 +36,10 @@ const jewellery=[
 ] as const;
 export const products:Product[] = [...clothing.map((p,i)=>({...make(p,i,'clothing'),sizes:['XS','S','M','L','XL'],colors:['Natural','Sage','Black']})),...jewellery.map((p,i)=>({...make(p,i,'jewellery'),sizes:p[4]==='Rings'?['6','7','8','9']:['One size'],colors:['Gold','Silver']}))];
 function make(p:readonly [string,string,number,number|undefined,string],i:number,shopId:string):Product{return {id:`${shopId}-${i+1}`,slug:p[0].toLowerCase().replaceAll(' ','-'),shopId,name:p[0],image:photo(p[1]),price:p[2],salePrice:p[3],saleStart:p[3]?'2026-01-01T00:00:00Z':undefined,saleEnd:p[3]?'2030-12-31T23:59:59Z':undefined,category:p[4],description:shopId==='clothing'?'Thoughtfully made for the way you move through your day. A considered silhouette, beautiful texture, and an effortless fit. Part of the MS Collection essentials edit.':'A little everyday luxury. Thoughtfully finished with a timeless silhouette, this piece is made to be worn, loved, and layered. Keep dry and store in the included soft pouch.',sizes:[],colors:[],stock:12+i,featured:i<3};}
-export function isVisible(shop:Shop,allFloors:Floor[]=floors){return shop.active && !!shop.slot && !!shop.template && allFloors.some(f=>f.id===shop.floor&&f.active);}
+export function isVisible(shop:Shop,allFloors:Floor[]=floors){return shop.active;}
 export function onSale(p:Product,now=Date.now()){return p.salePrice!==undefined&&p.salePrice<p.price&&!!p.saleStart&&!!p.saleEnd&&now>=Date.parse(p.saleStart)&&now<=Date.parse(p.saleEnd);}
 export function price(p:Product){return onSale(p)?p.salePrice!:p.price;}
-export function money(value:number){return `Rs. ${value.toLocaleString('en-PK')}`;}
+export function money(value:number,currency='PKR'){return `${currency==='PKR'?'Rs.':currency} ${value.toLocaleString('en')}`;}
 export function visibleProducts(allShops=shops){const ids=new Set(allShops.filter(s=>isVisible(s)).map(s=>s.id));return products.filter(p=>ids.has(p.shopId));}
 export const cartLineSchema=z.object({productId:z.string(),size:z.string(),color:z.string(),quantity:z.number().int().min(1).max(20)});
 export type CartLine=z.infer<typeof cartLineSchema>;

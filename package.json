@@ -1,1 +1,31 @@
-{"name":"ms-collection","private":true,"workspaces":["apps/*","packages/*"],"scripts":{"dev":"npm run dev -w @ms/web","build":"npm run build -w @ms/web","start":"npm run start -w @ms/web","test":"tsx --test packages/shared/src/rules.test.ts"},"devDependencies":{"@playwright/test":"^1.65.1","tsx":"^4.20.0"}}
+{
+  "name": "ms-collection",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "node scripts/dev.cjs",
+    "dev:web": "npm run dev -w @ms/web",
+    "dev:admin": "npm run dev -w @ms/admin",
+    "dev:api": "npm run dev -w @ms/api",
+    "setup": "node scripts/setup.cjs",
+    "build": "node scripts/build.cjs",
+    "start": "node scripts/dev.cjs --production",
+    "test": "tsx --test packages/shared/src/rules.test.ts && npm run test -w @ms/api",
+    "typecheck": "npm run typecheck -w @ms/api && npm exec -w @ms/web -- next typegen && npm exec -w @ms/admin -- next typegen && tsc --noEmit -p apps/web/tsconfig.json && tsc --noEmit -p apps/admin/tsconfig.json",
+    "test:browser": "node scripts/check-storefront.cjs",
+    "db:backup": "node scripts/backup.cjs",
+    "worker": "npm run worker -w @ms/api",
+    "launch:check": "node scripts/launch-check.cjs",
+    "catalogue:export": "node scripts/export-catalogue.cjs",
+    "catalogue:import": "tsx scripts/import-catalogue.ts",
+    "catalogue:verify": "tsx scripts/verify-catalogue-transfer.ts",
+    "test:professional": "node scripts/check-storefront.cjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1",
+    "tsx": "^4.20.0"
+  }
+}

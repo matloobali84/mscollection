@@ -1,0 +1,22 @@
+{
+ email {$TLS_EMAIL}
+}
+{$SITE_DOMAIN} {
+ encode zstd gzip
+ header {
+  X-Content-Type-Options nosniff
+  Referrer-Policy strict-origin-when-cross-origin
+  Permissions-Policy "camera=(), microphone=(), geolocation=()"
+ }
+ @api path /api/* /media/*
+ handle @api {
+  reverse_proxy api:4000
+ }
+ @admin path /admin /admin/*
+ handle @admin {
+  reverse_proxy admin:3001
+ }
+ handle {
+  reverse_proxy web:3000
+ }
+}

@@ -6,4 +6,11 @@ out/
 *.tar
 .env*
 !.env.example
+!.env.production.example
+.vercel/
 *.tsbuildinfo
+.data/
+.logs/
+outputs/
+playwright-report/
+test-results/

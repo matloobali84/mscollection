@@ -1,0 +1,17 @@
+node_modules
+**/node_modules
+**/.next
+**/*.tsbuildinfo
+.git
+.data
+.env
+.env.*
+outputs
+dist
+out
+.logs
+playwright-report
+test-results
+*.tar*
+*.mp4
+*.pdf

@@ -1,0 +1,45 @@
+{
+  "name": "@ms/api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
+    "typecheck": "tsc --noEmit",
+    "db:migrate": "tsx src/manage.ts migrate",
+    "db:seed": "tsx src/manage.ts seed",
+    "test": "tsx --test src/integration.test.ts",
+    "worker": "tsx src/worker-server.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "latest",
+    "@aws-sdk/s3-request-presigner": "latest",
+    "@electric-sql/pglite": "latest",
+    "@fastify/cookie": "latest",
+    "@fastify/cors": "latest",
+    "@fastify/helmet": "latest",
+    "@fastify/multipart": "latest",
+    "@fastify/rate-limit": "latest",
+    "@fastify/static": "latest",
+    "@fastify/swagger": "latest",
+    "@fastify/swagger-ui": "latest",
+    "bcryptjs": "latest",
+    "bullmq": "latest",
+    "csv-parse": "^7.0.3",
+    "csv-stringify": "^6.9.0",
+    "dotenv": "latest",
+    "fastify": "latest",
+    "ioredis": "latest",
+    "nodemailer": "latest",
+    "pg": "latest",
+    "sharp": "latest",
+    "stripe": "^23.1.0",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "latest",
+    "@types/pg": "latest",
+    "typescript": "^5.8.0"
+  }
+}
