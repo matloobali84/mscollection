@@ -3,7 +3,7 @@ import {mkdir,writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {Queue,Worker} from 'bullmq';
 import type {Database} from './db';import {root,settings} from './config';
-export function startWorker(db:Database){
+function createWorker(db:Database){
  let busy=false,stopped=false;
  const transport=process.env.SMTP_HOST?nodemailer.createTransport({host:process.env.SMTP_HOST,port:Number(process.env.SMTP_PORT||1025),secure:process.env.SMTP_SECURE==='true',...(process.env.SMTP_USER?{auth:{user:process.env.SMTP_USER,pass:process.env.SMTP_PASSWORD}}:{})}):nodemailer.createTransport({streamTransport:true,buffer:true,newline:'unix'});
  async function deliver(id:string){
@@ -27,6 +27,7 @@ export function startWorker(db:Database){
   await db.query('DELETE FROM sessions WHERE expires_at<now()');
   await db.query("DELETE FROM account_reset_tokens WHERE expires_at<now()-interval '1 day'");
  }catch(e){console.error('Outbox worker:',e instanceof Error?e.message:e)}finally{busy=false}}
- const timer=setInterval(tick,5000);timer.unref();void tick();
- return async()=>{stopped=true;clearInterval(timer);while(busy)await new Promise(r=>setTimeout(r,25));await worker?.close();await queue?.close();transport.close()};
+ return {tick,close:async()=>{stopped=true;while(busy)await new Promise(r=>setTimeout(r,25));await worker?.close();await queue?.close();transport.close()}};
 }
+export function startWorker(db:Database){const worker=createWorker(db);const timer=setInterval(worker.tick,5000);timer.unref();void worker.tick();return async()=>{clearInterval(timer);await worker.close()};}
+export async function drainOutbox(db:Database){const worker=createWorker(db);try{await worker.tick()}finally{await worker.close()}}

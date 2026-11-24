@@ -48,4 +48,4 @@ scripts          Setup, checks, backups and catalogue transfer
 deploy           Production container and ingress configuration
 ```
 
-See [operations](docs/operations.md), [Vercel setup for website and admin](docs/vercel.md), [Docker deployment](docs/go-live.md) and [scope](docs/requirements-coverage.md). The server-backed website runs locally until its services are deployed; the earlier hosted static prototype is separate. Sample-photo attribution is retained in [sample-catalogue-license.txt](docs/sample-catalogue-license.txt).
+See [operations](docs/operations.md), [Vercel setup for website and admin](docs/vercel.md), [Docker deployment](docs/go-live.md) and [scope](docs/requirements-coverage.md). The Vercel topology runs commerce inside the storefront Node functions with external PostgreSQL and Blob; the earlier hosted static prototype is separate. Sample-photo attribution is retained in [sample-catalogue-license.txt](docs/sample-catalogue-license.txt).

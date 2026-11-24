@@ -22,7 +22,8 @@
     "catalogue:export": "node scripts/export-catalogue.cjs",
     "catalogue:import": "tsx scripts/import-catalogue.ts",
     "catalogue:verify": "tsx scripts/verify-catalogue-transfer.ts",
-    "test:professional": "node scripts/check-storefront.cjs"
+    "test:professional": "node scripts/check-storefront.cjs",
+    "deploy:bootstrap": "tsx scripts/prepare-vercel-store.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1",

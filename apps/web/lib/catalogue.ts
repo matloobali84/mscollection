@@ -6,11 +6,13 @@ export type LiveProduct=Product&{variants:Variant[];currency:string;gender:strin
 export type StoreSettings={storeMode?:'demo'|'live';supportEmail?:string;supportWhatsApp?:string;businessAddress?:string;deliveryPolicy?:string;returnsPolicy?:string;privacyPolicy?:string;termsPolicy?:string;name:string;logo:string;primaryColor:string;currency:string;country:string;shippingFee:number;freeShippingThreshold:number;taxPercent:number;guestCheckout:boolean};
 export type Catalogue={shops:Collection[];products:LiveProduct[];settings:StoreSettings;revision:number};
 export const getCatalogue=cache(async function getCatalogue():Promise<Catalogue>{
+ if(process.env.VERCEL==='1'&&!process.env.API_INTERNAL_URL){const {readHostedCatalogue}=await import('./server-api');return readHostedCatalogue('catalogue')}
  const result=await fetch(`${process.env.API_INTERNAL_URL||'http://127.0.0.1:4000'}/api/v1/catalogue`,{cache:'no-store'});
  if(!result.ok)throw new Error('The catalogue service is unavailable');
  return result.json();
 });
 export const getStoreSettings=cache(async function getStoreSettings():Promise<StoreSettings>{
+ if(process.env.VERCEL==='1'&&!process.env.API_INTERNAL_URL){const {readHostedCatalogue}=await import('./server-api');return readHostedCatalogue('store')}
  const result=await fetch(`${process.env.API_INTERNAL_URL||'http://127.0.0.1:4000'}/api/v1/store`,{cache:'no-store'});
  if(!result.ok)throw new Error('The store service is unavailable');
  return result.json();

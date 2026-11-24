@@ -1,5 +1,7 @@
 # MS Collection: deployment handoff
 
+The current Vercel deployment uses the integrated commerce API, Neon PostgreSQL and Blob; see [vercel.md](vercel.md). The Docker stack below remains an alternative topology.
+
 The working application is the Next.js customer site, Next.js admin, Fastify API and PostgreSQL database. The older Sites static preview is a separate prototype. This package preserves the complete server-backed store; it does not publish a disconnected static catalogue.
 
 ## Current local state

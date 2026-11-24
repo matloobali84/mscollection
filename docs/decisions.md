@@ -6,7 +6,7 @@ On 24 November 2026 the owner requested removal of the 3D shopping mall and conv
 
 ## Architecture
 
-- Next.js storefront and separate authenticated Next.js admin, with a Fastify API and PostgreSQL. PGlite provides persistent PostgreSQL locally; production uses a standalone database.
+- Next.js storefront and separate authenticated Next.js admin, with a Fastify API and PostgreSQL. Vercel hosts that API inside storefront Node Route Handlers; the standalone local/Docker service remains supported. PGlite provides persistent PostgreSQL locally; production uses a standalone database.
 - React and CSS render the customer experience. Three.js, React Three Fiber, scene workspaces, model previews and model upload routes have been retired. Previous local code/assets are archived under ignored outputs/retired-mall/.
 - Collections replace customer-facing shops. New collections need no floor, slot or scene template. Internal shops identifiers and legacy database columns remain for compatibility and lossless catalogue transfer; public visibility depends on the collection's active flag.
 - Existing product data, uploaded merchant media, customer accounts, orders, audit history and stock are preserved. Legacy navigation URLs redirect to the storefront or matching collection/product page.

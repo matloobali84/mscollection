@@ -10,8 +10,8 @@ import {onlinePaymentsEnabled,handleWebhook,paymentProvider} from './payments';
 import {processUpload,storageRoutes} from './media';
 export async function buildApp(db:Database,logging=true){
  const app=Fastify({trustProxy:process.env.TRUST_PROXY==='1'?(_address:string,hop:number)=>hop===0:false,ajv:{customOptions:{coerceTypes:false}},logger:logging?{redact:['req.headers.cookie','req.headers.authorization','req.headers.x-csrf-token']}:false,bodyLimit:2*1024*1024});
- await app.register(cookie);await app.register(cors,{origin:settings.origins,credentials:true});await app.register(helmet,{contentSecurityPolicy:false});await app.register(rateLimit,{max:300,timeWindow:'1 minute',allowList:req=>['GET','HEAD'].includes(req.method)&&req.url.startsWith('/media/')});await app.register(multipart,{limits:{fileSize:10*1024*1024,files:1}});
- await app.register(swagger,{openapi:{info:{title:'MS Collection API',version:'1.0.0'},components:{securitySchemes:{session:{type:'apiKey',in:'cookie',name:'ms_admin'},csrf:{type:'apiKey',in:'header',name:'x-csrf-token'}}}}});await app.register(swaggerUI,{routePrefix:'/docs',uiConfig:{requestInterceptor:(req:any)=>{req.headers['x-requested-with']='MSCollection';return req;}}});
+ await app.register(cookie);await app.register(cors,{origin:settings.origins,credentials:true});await app.register(helmet,{contentSecurityPolicy:false});await app.register(rateLimit,{max:300,timeWindow:'1 minute',allowList:req=>['GET','HEAD'].includes(req.method)&&req.url.startsWith('/media/')});await app.register(multipart,{limits:{fileSize:(process.env.VERCEL==='1'?4:10)*1024*1024,files:1}});
+ if(process.env.VERCEL!=='1'){await app.register(swagger,{openapi:{info:{title:'MS Collection API',version:'1.0.0'},components:{securitySchemes:{session:{type:'apiKey',in:'cookie',name:'ms_admin'},csrf:{type:'apiKey',in:'header',name:'x-csrf-token'}}}}});await app.register(swaggerUI,{routePrefix:'/docs',uiConfig:{requestInterceptor:(req:any)=>{req.headers['x-requested-with']='MSCollection';return req;}}});}
  const inputSchemas:Record<string,z.ZodType>={shops:shopInput,categories:categoryInput,products:productInput,sales:saleInput,users:adminUserInput,settings:settingsInput};
  app.addHook('onRoute',route=>{
   if(!route.url.startsWith('/api/v1/'))return;
@@ -21,7 +21,7 @@ export async function buildApp(db:Database,logging=true){
   const json=body?z.toJSONSchema(body,{target:'draft-7',unrepresentable:'any'}):undefined;if(json)delete json.$schema;
   route.schema={...route.schema,tags:[path.includes('/admin/')?'Administration':path.includes('/auth/')?'Authentication':'Storefront'],summary:method+' '+path,...(path.includes('/admin/')&&!path.endsWith('/login')?{security:[{session:[],...(!['GET','HEAD'].includes(method)?{csrf:[]}:{})}]}:{}),...(json?{body:json}:{})};
  });
- await mkdir(settings.mediaDir,{recursive:true});await app.register(fastifyStatic,{root:settings.mediaDir,prefix:'/media/',decorateReply:false,maxAge:'1y',immutable:true});
+ if(process.env.VERCEL!=='1'){await mkdir(settings.mediaDir,{recursive:true});await app.register(fastifyStatic,{root:settings.mediaDir,prefix:'/media/',decorateReply:false,maxAge:'1y',immutable:true});}
  app.setErrorHandler((error:any,req,reply)=>{if(error instanceof z.ZodError)return reply.code(400).send({error:'Validation failed',details:error.issues.map(i=>({path:i.path.join('.'),message:i.message}))});if(['23505','23503','23514'].includes(error.code))return reply.code(409).send({error:error.code==='23505'?'This value or slot is already in use':'The record conflicts with related data or constraints'});const status=error.statusCode||500;if(status>=500)req.log.error(error);reply.code(status).send({error:status>=500?'Service unavailable. Please try again.':error.message});});
  app.addHook('onRequest',async(req,reply)=>{
   if(!['GET','HEAD','OPTIONS'].includes(req.method)){

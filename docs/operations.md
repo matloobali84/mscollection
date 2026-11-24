@@ -1,5 +1,7 @@
 # Running and operating MS Collection
 
+For the hosted Vercel installation, see [vercel.md](vercel.md). Its commerce API runs inside storefront Node functions, uses external PostgreSQL/Blob, and drains configured SMTP work after writes. The local and standalone-server commands below retain their original behavior.
+
 ## Local workspace
 
 Run `npm install`, `npm run setup`, then `npm run dev` from the repository root. Node.js 20.9 or newer is required. Setup creates an ignored `.env` with random local infrastructure passwords, migrates/seeds the database, and writes the initial owner login to `.data/initial-admin.txt`. Setup is repeatable and does not reset data or change the owner password.

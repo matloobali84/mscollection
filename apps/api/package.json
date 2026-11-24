@@ -24,6 +24,7 @@
     "@fastify/static": "latest",
     "@fastify/swagger": "latest",
     "@fastify/swagger-ui": "latest",
+    "@vercel/blob": "^2.4.0",
     "bcryptjs": "latest",
     "bullmq": "latest",
     "csv-parse": "^7.0.3",
