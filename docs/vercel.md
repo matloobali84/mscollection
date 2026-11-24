@@ -4,8 +4,10 @@ Create two Vercel projects from the same GitHub repository and production branch
 
 | Project | Root directory | Framework | Install command | Build command |
 | --- | --- | --- | --- | --- |
-| Storefront | `apps/web` | Next.js | `npm ci --prefix ../..` | `npm run build` |
-| Administration | `apps/admin` | Next.js | `npm ci --prefix ../..` | `npm run build` |
+| Storefront | `apps/web` | Next.js | `npm ci` | `npm run build` |
+| Administration | `apps/admin` | Next.js | `npm ci` | `npm run build` |
+
+Use the checked-in install command without a relative `--prefix`. npm detects the workspace root and its committed `package-lock.json` whether the command starts at the repository root or inside either app. A relative prefix can point outside the checkout during Vercel's install step and fail with `EUSAGE` / a missing lockfile. If the project dashboard has an old Install Command override, change it to `npm ci` too. Deploy the latest `main` commit rather than redeploying the earlier failed commit.
 
 Vercel documentation: [monorepos](https://vercel.com/docs/monorepos), [monorepo FAQ](https://vercel.com/docs/monorepos/monorepo-faq).
 
