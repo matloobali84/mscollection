@@ -23,6 +23,7 @@
     "catalogue:import": "tsx scripts/import-catalogue.ts",
     "catalogue:verify": "tsx scripts/verify-catalogue-transfer.ts",
     "test:professional": "node scripts/check-storefront.cjs",
+    "test:ux": "node scripts/check-redesign.cjs",
     "deploy:bootstrap": "tsx scripts/prepare-vercel-store.ts"
   },
   "devDependencies": {
