@@ -73,7 +73,7 @@ const web=(process.env.STOREFRONT_URL||'http://localhost:3000').replace(/\/$/,''
   const admin=await browser.newPage({viewport:{width:1440,height:1000}});watch(admin);
   const credentials=await fs.readFile('.data/initial-admin.txt','utf8');
   const hydrated=admin.waitForResponse(r=>r.url().endsWith('/api/v1/admin/me'));await admin.goto(adminUrl);await hydrated;await admin.screenshot({caret:'initial',path:'outputs/redesign-admin-login.png'});
-  await admin.getByLabel('Email address').fill(credentials.match(/Email: (.+)/)[1].trim());await admin.getByLabel('Password',{exact:true}).fill(credentials.match(/Password: (.+)/)[1].trim());await admin.getByRole('button',{name:'Sign in to your store'}).click();
+  await admin.getByLabel('Username or email').fill(credentials.match(/Email: (.+)/)[1].trim());await admin.getByLabel('Password',{exact:true}).fill(credentials.match(/Password: (.+)/)[1].trim());await admin.getByRole('button',{name:'Sign in to your store'}).click();
   await admin.getByRole('heading',{name:'Store overview'}).waitFor();await admin.locator('.stat-grid').waitFor();
   await admin.screenshot({caret:'initial',path:'outputs/redesign-admin-dashboard.png'});
   await admin.getByRole('button',{name:'Products',exact:true}).click();await admin.getByRole('button',{name:'Add product',exact:true}).click();

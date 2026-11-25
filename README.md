@@ -20,6 +20,8 @@ npm run dev
 
 Setup is repeatable. It writes the initial owner login to private .data/initial-admin.txt and persists development PostgreSQL through PGlite in .data/postgres. Do not run a second API process against the same embedded database.
 
+Admin accepts an email address or, for internal `@mscollection.local` accounts, the username before `@`. Customer sign-in continues to require an email address. Current owner credentials are stored only in ignored local files.
+
 ## Shopping and administration
 
 The storefront includes responsive navigation, collection pages, search, category/price/sale filters, sorting, product galleries and variants, wishlist, server-backed bag, checkout, private order links, customer accounts, saved addresses and password recovery. Product photos and fonts are served locally. Admin manages collections, categories, products/images/variants, inventory, scheduled sales, orders, customers, staff roles, policies and store settings.

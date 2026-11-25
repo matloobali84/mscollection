@@ -7,6 +7,7 @@ export const modelUrlInput=z.string().max(2048).refine(s=>!s||((s.startsWith('/m
 export const entityInput=z.object({name:label,kind:z.enum(['person','mannequin','display']),floorId:id,shopId:id.nullable().default(null),productId:id.nullable().default(null),modelUrl:modelUrlInput.default('/models/human-walker.glb'),x:z.number().min(-35).max(35).default(0),y:z.number().min(0).max(10).default(0),z:z.number().min(-29).max(33).default(0),yaw:z.number().min(-360).max(360).default(0),scale:z.number().min(.1).max(5).default(1),animation:z.string().max(100).default(''),active:z.boolean().default(true)});
 export const roles=['super_admin','manager','editor'] as const;
 export const loginSchema=z.object({email:z.email().max(200),password:z.string().min(1).max(128)});
+export const adminLoginSchema=loginSchema.extend({email:z.string().trim().max(200).refine(value=>z.email().safeParse(value).success||/^[a-zA-Z0-9][a-zA-Z0-9._-]{2,63}$/.test(value),'Enter your username or email address')});
 export const passwordInput=z.string().min(10).max(72).refine(s=>new TextEncoder().encode(s).length<=72,'Use a shorter password.');
 export const registerSchema=loginSchema.extend({name:label,password:passwordInput,phone:z.string().max(40).default('')});
 export const floorInput=z.object({name:label,level:z.number().int().min(0).max(99),sortOrder:z.number().int().default(0),active:z.boolean().default(true),layout:z.enum(['standard']).default('standard')});

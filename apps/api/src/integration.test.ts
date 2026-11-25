@@ -8,6 +8,20 @@ test('database-backed commerce, RBAC, visibility, checkout and inventory',async 
  function client(){let cookies:Record<string,string>={},csrf='';return {async send(path:string,method='GET',body?:any){const response=await app.inject({url:'/api/v1/'+path,method:method as any,headers:{cookie:Object.entries(cookies).map(([k,v])=>`${k}=${v}`).join('; '),'x-requested-with':'MSCollection','x-csrf-token':csrf},...(body?{payload:body}:{})});for(const c of response.cookies)cookies[c.name]=c.value;const data=response.json();if(data.csrf)csrf=data.csrf;return {status:response.statusCode,data}},get csrf(){return csrf}}}
  const owner=client();
  try{
+ await t.test('internal admin usernames resolve case-insensitively without changing customer login rules',async()=>{
+  const id=randomUUID(),password='Fixture-only-password!';
+  await db.query('INSERT INTO admin_users(id,email,name,password_hash,role) VALUES ($1,$2,$3,$4,$5)',[id,'shop_staff@mscollection.local','Username fixture',await hash(password,4),'editor']);
+  const staff=client();
+  assert.equal((await staff.send('admin/login','POST',{email:'shop_staff',password:'wrong'})).status,401);
+  const signed=await staff.send('admin/login','POST',{email:' SHOP_STAFF ',password});
+  assert.equal(signed.status,200);assert.equal(signed.data.user.id,id);assert.ok(signed.data.csrf);
+  assert.equal((await staff.send('admin/products')).status,200);
+  assert.equal((await client().send('admin/login','POST',{email:'shop_staff@mscollection.local',password})).status,200);
+  assert.equal((await client().send('auth/login','POST',{email:'shop_staff',password})).status,400);
+  await db.query('UPDATE admin_users SET active=false WHERE id=$1',[id]);
+  assert.equal((await client().send('admin/login','POST',{email:'shop_staff',password})).status,401);
+  assert.equal((await staff.send('admin/products')).status,401);
+ });
  await t.test('browsing hundreds of product photos preserves the API request allowance',async()=>{for(let i=0;i<310;i++){const r=await app.inject({url:'/media/missing-catalogue-test.webp',method:i%2?'HEAD':'GET'});assert.equal(r.statusCode,404);assert.equal(r.headers['x-ratelimit-limit'],undefined)}assert.equal((await client().send('catalogue')).status,200)});
  await t.test('admin endpoints deny guests; login yields a secure session',async()=>{assert.equal((await client().send('admin/products')).status,401);const r=await owner.send('admin/login','POST',{email:'test-owner@example.com',password:'Test-Only-Password-2026!'});assert.equal(r.status,200);assert.ok(r.data.csrf);assert.equal((await owner.send('admin/products')).data.length,20)});
  await t.test('slot constraints and admin-created shops drive public visibility',async()=>{const shop={name:'Test Boutique',slug:'test-boutique',tagline:'A new shop',category:'Lifestyle',floorId:'ground',slotId:'ground-A03',template:'generic',color:'#445544',logo:'',active:true};const created=await owner.send('admin/shops','POST',shop);assert.equal(created.status,200);assert.equal((await owner.send('admin/shops','POST',{...shop,slug:'duplicate-slot'})).status,409);let mall=(await client().send('catalogue')).data;assert.ok(mall.shops.some((s:any)=>s.id===created.data.id));assert.equal((await owner.send(`admin/shops/${created.data.id}/deactivate`,'POST')).status,200);mall=(await client().send('catalogue')).data;assert.ok(!mall.shops.some((s:any)=>s.id===created.data.id))});
