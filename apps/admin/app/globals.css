@@ -15,4 +15,4 @@
 @media(max-width:400px){.record-form{grid-template-columns:1fr}.record-form>.full-field,.variant-section,.form-actions{grid-column:1}.stat>strong{font-size:23px}.stat{padding:16px 13px}.stat>div>span{font-size:11px}.stat>small{font-size:10px}.table-extra{gap:14px}.launch-counts>.card{padding:17px}.launch-counts strong{font-size:25px}.page-heading h1{font-size:27px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 
-@media(min-width:761px){.sidebar nav>button{font-size:14px}.stat>div>span{font-size:14px}.stat>small{font-size:12px}td{font-size:14px}.record-name small,.cell-small{font-size:12px}.badge{font-size:12px}}
+.rail-admin-help{display:block;font-size:12px;font-weight:400;color:#657466;margin-top:5px;line-height:1.6}@media(min-width:761px){.sidebar nav>button{font-size:14px}.stat>div>span{font-size:14px}.stat>small{font-size:12px}td{font-size:14px}.record-name small,.cell-small{font-size:12px}.badge{font-size:12px}}

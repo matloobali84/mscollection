@@ -7,6 +7,7 @@ The November 2026 refresh uses white and cool gray surfaces, graphite text and a
 - Search includes matching product suggestions and collection shortcuts. Filters support collection, category, price, availability and sale items, with removable applied filters.
 - Product cards link to full product pages and offer a separate quick view. Product pages include ordered sizes, compatible color selections, image enlargement, stock information and mobile purchase controls.
 - Mobile navigation, keyboard dismissal, focus containment and visible focus states are included in the shopping and administration dialogs.
+- The homepage clothing rail displays real product photos on illustrated hangers, with prices, mobile scrolling, desktop arrows, quick view and product links. Admin product editors can select "Show on homepage clothing rail" and set Display order. Active, available selections appear first; when no selections exist, the rail offers clothing from the current catalogue. Transparent garment photos work best. Hidden collections and unavailable products are excluded.
 - Bag and checkout display the existing server-calculated prices, delivery charges and stock. Account, order tracking, help pages and the administration dashboard share the refreshed typography and spacing.
 - Sample inventory and unconfigured merchant policies remain identified; the design does not add invented reviews, payment methods or delivery promises.
 

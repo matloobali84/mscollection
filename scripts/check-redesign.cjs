@@ -8,6 +8,12 @@ const web=(process.env.STOREFRONT_URL||'http://localhost:3000').replace(/\/$/,''
   const page=await browser.newPage({viewport:{width:1440,height:1000}});watch(page);
   assert.equal((await page.goto(web,{waitUntil:'domcontentloaded'})).status(),200);
   await page.locator('.campaign-image').evaluate(img=>img.decode());
+  const rail=page.locator('.hanging-edit'),track=rail.getByRole('list',{name:'Hanging clothing products'});
+  await rail.scrollIntoViewIfNeeded();await expect(rail.getByRole('button',{name:'Next hanging products'})).toBeEnabled();
+  await rail.getByRole('button',{name:'Next hanging products'}).click();await expect.poll(()=>track.evaluate(el=>el.scrollLeft)).toBeGreaterThan(100);
+  await track.focus();await page.keyboard.press('ArrowLeft');await expect.poll(()=>track.evaluate(el=>el.scrollLeft)).toBeLessThan(3);
+  await rail.getByRole('button',{name:/^Quick view hanging /}).first().click();await expect(page.getByRole('dialog')).toBeVisible();
+  await page.getByRole('button',{name:'Close product'}).click();
   const search=page.getByRole('searchbox',{name:'Search the store'});
   await search.fill('Linen Everyday Shirt');
   const suggestions=page.getByRole('region',{name:'Search suggestions'});
@@ -52,6 +58,8 @@ const web=(process.env.STOREFRONT_URL||'http://localhost:3000').replace(/\/$/,''
   await mobile.keyboard.press('Escape');await expect(mobile.getByRole('dialog')).toHaveCount(0);
   assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
   await mobile.locator('.campaign-image').evaluate(img=>img.decode());await mobile.screenshot({caret:'initial',path:'outputs/redesign-mobile.png'});
+  await mobile.locator('.hanging-edit').scrollIntoViewIfNeeded();await mobile.locator('.hanging-edit').screenshot({caret:'initial',path:'outputs/hanging-rail-mobile.png'});
+  assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
   await mobile.goto(web+'/products/linen-everyday-shirt');
   await expect(mobile.locator('.mobile-purchase-bar')).toBeVisible();await expect(mobile.locator('.mobile-purchase-bar .primary')).toBeEnabled();
   assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
