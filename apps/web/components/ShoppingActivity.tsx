@@ -11,7 +11,7 @@ export default function ShoppingActivity({products,currency,demo,blocked,onInspe
  const shown=useRef(0),showing=useRef(false);showing.current=visible;
  useEffect(()=>{try{setDismissed(sessionStorage.getItem('ms-shopping-activity-hidden')==='1')}catch{}},[]);
  useEffect(()=>{
-  if(blocked||dismissed){setVisible(false);return;}
+  if(blocked||dismissed){setVisible(false);setHovered(false);setFocused(false);return;}
   const show=()=>{if(shown.current>=3||showing.current||document.visibilityState!=='visible'||!latest.current.length)return;setIndex(shown.current%latest.current.length);shown.current++;setVisible(true)};
   const first=setTimeout(show,12000),next=setInterval(show,60000);return()=>{clearTimeout(first);clearInterval(next)};
  },[blocked,dismissed,demo]);
