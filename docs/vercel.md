@@ -43,7 +43,7 @@ The database is bootstrapped separately, not during function cold starts. The lo
 
 The bootstrap script requires external PostgreSQL and Blob credentials, applies migrations, seeds the owner, transfers media with a resumable private URL map, and imports the catalogue transactionally. It refuses a database with customer/order or custom catalogue data. It never opens or overwrites local PGlite. Owner login is saved privately to .data/production-admin.txt; no password belongs in this document.
 
-Future database migrations must also run as an explicit deployment task against production before publishing code that needs them. Do not rerun bootstrap over an operating store.
+Future database migrations run through `npm run deploy:database` after pulling the storefront production environment. The release task writes and checksum-verifies a private backup of every application table plus the applied migration SQL under ignored `.data/backups/`, upgrades the schema in one transaction, and installs the tested legacy-checkout compatibility triggers. Existing records are preserved. A failed migration rolls back the whole schema upgrade. The compatibility layer keeps old checkout inserts valid during rollout or rollback while preserving original quotes; new code retains its normal review workflow. Publish the storefront/API and admin after this task succeeds. Do not rerun bootstrap over an operating store.
 
 ## Runtime behavior
 

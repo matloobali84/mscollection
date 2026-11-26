@@ -1,0 +1,12 @@
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS account_type text NOT NULL DEFAULT 'customer' CHECK(account_type IN ('customer','reseller'));
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS username text;
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS active boolean NOT NULL DEFAULT true;
+ALTER TABLE customers ALTER COLUMN email DROP NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS reseller_username_idx ON customers(lower(username)) WHERE account_type='reseller' AND username IS NOT NULL;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS regular_discount jsonb NOT NULL DEFAULT '{"type":"none","value":0}';
+ALTER TABLE products ADD COLUMN IF NOT EXISTS reseller_price integer CHECK(reseller_price>=0 AND reseller_price<=100000000);
+ALTER TABLE products ADD COLUMN IF NOT EXISTS reseller_discount jsonb NOT NULL DEFAULT '{"type":"none","value":0}';
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS pricing_tier text NOT NULL DEFAULT 'regular' CHECK(pricing_tier IN ('regular','reseller'));
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS reseller_id text REFERENCES customers(id);
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS reseller_username_snapshot text NOT NULL DEFAULT '';
+CREATE INDEX IF NOT EXISTS reseller_orders_idx ON orders(reseller_id,created_at DESC);

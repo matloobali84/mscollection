@@ -1,0 +1,10 @@
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS courier text NOT NULL DEFAULT '';
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS tracking_id text NOT NULL DEFAULT '';
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS dispatched_at timestamptz;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivered_at timestamptz;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS version integer NOT NULL DEFAULT 1;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS pricing_settings jsonb;
+CREATE TABLE IF NOT EXISTS order_events (id text PRIMARY KEY,order_id text NOT NULL REFERENCES orders(id),status text NOT NULL,message text NOT NULL,created_at timestamptz NOT NULL DEFAULT now());
+CREATE INDEX IF NOT EXISTS order_events_order_idx ON order_events(order_id,created_at);
+CREATE INDEX IF NOT EXISTS order_status_created_idx ON orders(status,created_at DESC);
+INSERT INTO order_events(id,order_id,status,message,created_at) SELECT 'legacy-'||id,id,status,'Existing order status recorded',updated_at FROM orders ON CONFLICT(id) DO NOTHING;

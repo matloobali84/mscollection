@@ -24,7 +24,12 @@
     "catalogue:verify": "tsx scripts/verify-catalogue-transfer.ts",
     "test:professional": "node scripts/check-storefront.cjs",
     "test:ux": "node scripts/check-redesign.cjs",
-    "deploy:bootstrap": "tsx scripts/prepare-vercel-store.ts"
+    "test:orders": "node scripts/check-order-management.cjs",
+    "test:billing": "node scripts/check-order-billing.cjs",
+    "deploy:bootstrap": "tsx scripts/prepare-vercel-store.ts",
+    "test:resellers": "node scripts/check-resellers.cjs",
+    "test:listings": "node scripts/check-admin-listings.cjs",
+    "deploy:database": "tsx scripts/release-database.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1",

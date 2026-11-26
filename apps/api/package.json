@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit",
     "db:migrate": "tsx src/manage.ts migrate",
     "db:seed": "tsx src/manage.ts seed",
-    "test": "tsx --test src/integration.test.ts",
+    "test": "tsx --test src/integration.test.ts src/order-management.test.ts src/order-billing.test.ts src/resellers.test.ts src/release-compatibility.test.ts",
     "worker": "tsx src/worker-server.ts"
   },
   "dependencies": {

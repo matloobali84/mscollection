@@ -1,16 +1,22 @@
 import {cache} from 'react';
+import {cookies} from 'next/headers';
 import type {Product} from '@ms/shared';
 export type Collection={id:string;name:string;slug:string;tagline:string;category:string;active:boolean;color:string;logo?:string};
-export type Variant={id:string;sku:string;size:string;color:string;stock:number;priceOverride:number|null};
+export type Variant={id:string;sku:string;size:string;color:string;stock:number;priceOverride:number|null;unitPrice?:number;basePrice?:number};
 export type LiveProduct=Product&{variants:Variant[];currency:string;gender:string;ageGroup:string;displayPoint?:string;displayGroup?:string;displayOrder?:number;salePinned?:boolean};
 export type StoreSettings={storeMode?:'demo'|'live';supportEmail?:string;supportWhatsApp?:string;businessAddress?:string;deliveryPolicy?:string;returnsPolicy?:string;privacyPolicy?:string;termsPolicy?:string;name:string;logo:string;primaryColor:string;currency:string;country:string;shippingFee:number;freeShippingThreshold:number;taxPercent:number;guestCheckout:boolean};
-export type Catalogue={shops:Collection[];products:LiveProduct[];settings:StoreSettings;revision:number};
+export type Catalogue={shops:Collection[];products:LiveProduct[];settings:StoreSettings;revision:number;pricingTier?:'regular'|'reseller'};
 export const getCatalogue=cache(async function getCatalogue():Promise<Catalogue>{
- if(process.env.VERCEL==='1'&&!process.env.API_INTERNAL_URL){const {readHostedCatalogue}=await import('./server-api');return readHostedCatalogue('catalogue')}
- const result=await fetch(`${process.env.API_INTERNAL_URL||'http://127.0.0.1:4000'}/api/v1/catalogue`,{cache:'no-store'});
+ const token=(await cookies()).get('ms_customer')?.value;
+ return readCatalogue(token?'ms_customer='+encodeURIComponent(token):undefined);
+});
+export const getPublicCatalogue=cache(async()=>readCatalogue());
+async function readCatalogue(cookie?:string):Promise<Catalogue>{
+ if(process.env.VERCEL==='1'&&!process.env.API_INTERNAL_URL){const {readHostedCatalogue}=await import('./server-api');return readHostedCatalogue('catalogue',cookie)}
+ const result=await fetch(`${process.env.API_INTERNAL_URL||'http://127.0.0.1:4000'}/api/v1/catalogue`,{cache:'no-store',headers:cookie?{cookie}:undefined});
  if(!result.ok)throw new Error('The catalogue service is unavailable');
  return result.json();
-});
+}
 export const getStoreSettings=cache(async function getStoreSettings():Promise<StoreSettings>{
  if(process.env.VERCEL==='1'&&!process.env.API_INTERNAL_URL){const {readHostedCatalogue}=await import('./server-api');return readHostedCatalogue('store')}
  const result=await fetch(`${process.env.API_INTERNAL_URL||'http://127.0.0.1:4000'}/api/v1/store`,{cache:'no-store'});

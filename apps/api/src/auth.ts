@@ -8,7 +8,7 @@ export function problem(status:number,message:string):never{throw Object.assign(
 export async function session(db:Queryable,req:FastifyRequest,kind:'admin'|'customer'){
  const token=req.cookies[kind==='admin'?'ms_admin':'ms_customer'];if(!token)return null;
  const table=kind==='admin'?'admin_users':'customers';
- const rows=(await db.query(`SELECT u.*,s.csrf,s.token_hash FROM sessions s JOIN ${table} u ON u.id=s.user_id WHERE s.token_hash=$1 AND s.kind=$2 AND s.expires_at>now() ${kind==='admin'?'AND u.active=true':''}`,[digest(token),kind])).rows;
+ const rows=(await db.query(`SELECT u.*,s.csrf,s.token_hash FROM sessions s JOIN ${table} u ON u.id=s.user_id WHERE s.token_hash=$1 AND s.kind=$2 AND s.expires_at>now() AND u.active=true`,[digest(token),kind])).rows;
  return rows[0]||null;
 }
 export async function newSession(db:Queryable,reply:FastifyReply,userId:string,kind:'admin'|'customer'){

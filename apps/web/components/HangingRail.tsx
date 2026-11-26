@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {ChevronLeft,ChevronRight,Plus} from 'lucide-react';
-import {money,price} from '@ms/shared';
+import {money,price,productPhoto} from '@ms/shared';
 import type {LiveProduct} from '../lib/catalogue';
 import ProductImage from './ProductImage';
 
@@ -31,7 +31,7 @@ export default function HangingRail({products,currency,onInspect}:{products:Live
     {items.map(product=><article className='hanging-product' role='listitem' key={product.id}>
      <button className='hanger-look' aria-label={'Quick view hanging '+label(product)} onClick={()=>onInspect(product)}>
       <svg className='clothes-hanger' viewBox='0 0 220 130' fill='none' aria-hidden='true'><path d='M110 44V35c0-8 14-9 14-19a14 14 0 0 0-28 0' stroke='#68706a' strokeWidth='3.5' strokeLinecap='round'/><path d='m110 43-92 53c-8 5-5 13 3 13h178c8 0 11-8 3-13L110 43Z' stroke='#887452' strokeWidth='8' strokeLinejoin='round'/><path d='m110 44-91 53M110 44l91 53' stroke='#c6b58d' strokeWidth='2' strokeLinecap='round'/></svg>
-      <ProductImage src={product.media?.[0]?.variants?.['512']||product.image} alt={label(product)} loading='lazy' draggable={false}/>
+      <ProductImage src={productPhoto(product,'512')} alt={label(product)} loading='lazy' draggable={false}/>
       <span className='hanging-price-tag'><small>MS COLLECTION</small>{money(price(product),currency)}</span>
      </button>
      <div className='hanging-product-info'><a href={'/products/'+product.slug}>{label(product)}</a><span>{product.colors.slice(0,2).join(' / ')}{product.colors.length>2?' +'+(product.colors.length-2):''}</span><button onClick={()=>onInspect(product)}>Choose options<Plus size={15}/></button></div>

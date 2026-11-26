@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import {orderStatusLabel} from '../../../packages/shared/src/orders';
 import {mkdir,writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {Queue,Worker} from 'bullmq';
@@ -11,8 +12,8 @@ function createWorker(db:Database){
  try{
   if(settings.secure&&!process.env.SMTP_HOST)throw new Error('SMTP is required in production');
   const p=job.payload;
-  const subject=job.kind==='password-reset'?'Reset your MS Collection password':job.kind==='order-status'?`Order ${p.number}: ${p.status}`:`Order ${p.number} confirmation`;
-  const text=job.kind==='password-reset'?`Use this link to set a new password:\n\n${p.url}\n\nThis link expires in 30 minutes and can be used once. If you did not request this, you can ignore this email.`:job.kind==='order-status'?`Your order ${p.number} is now ${p.status}.`:`Thank you for your order ${p.number}. Total: ${p.currency} ${p.total}. Payment: ${p.paymentMethod==='online'?'online payment awaiting provider confirmation':'cash on delivery'}.`;
+  const subject=job.kind==='order-approved'?`Order ${p.number}: final bill approved`:job.kind==='password-reset'?'Reset your MS Collection password':job.kind==='order-status'?`Order ${p.number}: ${orderStatusLabel(p.status)}`:`Order ${p.number} confirmation`;
+  const text=job.kind==='order-approved'?`Your order ${p.number} has been confirmed.\nOriginal amount: ${p.currency} ${p.originalTotal}\nDiscount: ${p.currency} ${p.discount}\nFinal payable: ${p.currency} ${p.total}\n${p.paymentMethod==='online'?'Pay the approved bill from your private order details page.':'Pay the approved final amount on delivery.'}`:job.kind==='password-reset'?`Use this link to set a new password:\n\n${p.url}\n\nThis link expires in 30 minutes and can be used once. If you did not request this, you can ignore this email.`:job.kind==='order-status'?`Your order ${p.number} is now ${orderStatusLabel(p.status).toLowerCase()}.${p.courier?'\nCourier: '+p.courier:''}${p.trackingId?'\nTracking ID: '+p.trackingId:''}`:`Order ${p.number} has been received for review. Initial quote: ${p.currency} ${p.total}. Our team will confirm the final bill before payment or dispatch. Payment: ${p.paymentMethod==='online'?'online payment after bill approval':'approved amount due on delivery'}.`;
   const result=await transport.sendMail({from:process.env.EMAIL_FROM||'MS Collection <store@mscollection.local>',to:p.to,subject,text});
   if(!process.env.SMTP_HOST){await mkdir(resolve(root,'.data/mail'),{recursive:true});await writeFile(resolve(root,'.data/mail',`${job.id}.eml`),(result as any).message);}
   await db.query("UPDATE outbox SET status='sent',sent_at=now(),error=null,locked_at=null WHERE id=$1",[id]);

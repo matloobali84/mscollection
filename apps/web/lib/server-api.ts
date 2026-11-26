@@ -16,8 +16,8 @@ export function getHostedApi():Promise<HostedApi>{
  return hosted;
 }
 
-export async function readHostedCatalogue(path:'catalogue'|'store'){
- const {app}=await getHostedApi(),result=await app.inject({method:'GET',url:`/api/v1/${path}`});
+export async function readHostedCatalogue(path:'catalogue'|'store',cookie?:string){
+ const {app}=await getHostedApi(),result=await app.inject({method:'GET',url:`/api/v1/${path}`,headers:cookie?{cookie}:undefined});
  if(result.statusCode!==200)throw new Error('The catalogue service is unavailable');
  return result.json();
 }

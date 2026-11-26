@@ -25,7 +25,7 @@ export async function restoreCatalogue(db:Database,raw:unknown){
   for(const c of categories)if(c.parentId)await tx.query('UPDATE categories SET parent_id=$1 WHERE id=$2',[c.parentId,c.id]);
   for(const s of shops)await insert('shops',{id:s.id,name:s.name,slug:s.slug,tagline:s.tagline,category:s.category,floor_id:s.floorId,slot_id:s.slotId,template:s.template,color:s.color,logo:s.logo,interior_style:s.interiorStyle,active:s.active});
   for(const p of products){
-   await insert('products',{id:p.id,shop_id:p.shopId,category_id:p.categoryId,name:p.name,slug:p.slug,description:p.description,price:p.price,currency:p.currency,status:p.status,gender:p.gender,age_group:p.ageGroup,display_group:p.displayGroup,display_order:p.displayOrder,featured:p.featured,image:p.image,model_url:p.modelUrl,model_scale:p.modelScale});
+   await insert('products',{id:p.id,shop_id:p.shopId,category_id:p.categoryId,name:p.name,slug:p.slug,description:p.description,price:p.price,currency:p.currency,regular_discount:JSON.stringify(p.regularDiscount||{type:"none",value:0}),reseller_price:p.resellerPrice??null,reseller_discount:JSON.stringify(p.resellerDiscount||{type:"none",value:0}),status:p.status,gender:p.gender,age_group:p.ageGroup,display_group:p.displayGroup,display_order:p.displayOrder,featured:p.featured,image:p.image,model_url:p.modelUrl,model_scale:p.modelScale});
    for(const v of p.variants)await insert('product_variants',{id:v.id||randomUUID(),product_id:p.id,sku:v.sku,size:v.size,color:v.color,stock:v.stock,price_override:v.priceOverride,active:true});
    for(const [i,m] of p.media.entries())await insert('product_media',{id:randomUUID(),product_id:p.id,url:m.url,alt_text:m.alt,variants:JSON.stringify(m.variants),sort_order:i});
   }
